@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Event Planner by Muskii</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body { margin: 0; font-family: system-ui; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Calendar, Users, DollarSign, Palette, Shirt, Music, Sparkles, Heart, Gift } = lucide;
+
+        const EventPlannerApp = () => {
+          const [eventData, setEventData] = useState({
+            eventType: '',
+            budget: '',
+            guestCount: '',
+            preferences: [],
+            venue: ''
+          });
+
+          const [recommendations, setRecommendations] = useState(null);
+          const [isLoading, setIsLoading] = useState(false);
+
+          const eventTypes = [
+            { id: 'birthday', name: 'Birthday Party', icon: '🎂' },
+            { id: 'farewell', name: 'Farewell Party', icon: '👋' },
+            { id: 'office', name: 'Office Party', icon: '💼' },
+            { id: 'graduation', name: 'Graduation', icon: '🎓' },
+            { id: 'wedding', name: 'Wedding', icon: '💒' },
+            { id: 'casual', name: 'Casual Hangout', icon: '🎉' }
+          ];
+
+          const preferenceOptions = ['Elegant', 'Fun & Colorful', 'Minimalist', 'Vintage', 'Modern', 'Outdoor', 'Indoor', 'DIY-Friendly'];
+
+          const handleInputChange = (field, value) => {
+            setEventData(prev => ({
+              ...prev,
+              [field]: value
+            }));
+          };
+
+          const handlePreferenceToggle = (preference) => {
+            setEventData(prev => ({
+              ...prev,
+              preferences: prev.preferences.includes(preference)
+                ? prev.preferences.filter(p => p !== preference)
+                : [...prev.preferences, preference]
+            }));
+          };
+
+          const generateRecommendations = async () => {
+            setIsLoading(true);
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            const mockRecommendations = {
+              theme: {
+                name: getThemeForEvent(eventData.eventType),
+                description: getThemeDescription(eventData.eventType),
+                colors: getThemeColors(eventData.eventType)
+              },
+              outfits: getOutfitRecommendations(eventData.eventType, eventData.budget),
+              decor: getDecorIdeas(eventData.eventType, eventData.budget),
+              playlist: getPlaylistSuggestions(eventData.eventType),
+              budget: getBudgetBreakdown(eventData.budget, eventData.guestCount)
+            };
+
+            setRecommendations(mockRecommendations);
+            setIsLoading(false);
+          };
+
+          const getThemeForEvent = (type) => {
+            const themes = {
+              birthday: 'Neon Glow Party',
+              farewell: 'Memory Lane Celebration',
+              office: 'Professional Elegance',
+              graduation: 'Achievement Celebration',
+              wedding: 'Romantic Garden',
+              casual: 'Cozy Gathering'
+            };
+            return themes[type] || 'Custom Theme';
+          };
+
+          const getThemeDescription = (type) => {
+            const descriptions = {
+              birthday: 'A vibrant celebration with neon lights, glow sticks, and colorful decorations that create an energetic atmosphere.',
+              farewell: 'A heartwarming theme focusing on memories, photo displays, and meaningful moments shared together.',
+              office: 'Sophisticated and professional with elegant decorations suitable for workplace celebrations.',
+              graduation: 'Academic-inspired theme celebrating achievements with caps, diplomas, and success motifs.',
+              wedding: 'Romantic and elegant with floral arrangements, soft lighting, and timeless decorations.',
+              casual: 'Relaxed and comfortable atmosphere perfect for intimate gatherings with friends.'
+            };
+            return descriptions[type] || 'A wonderful celebration tailored to your preferences.';
+          };
+
+          const getThemeColors = (type) => {
+            const colors = {
+              birthday: ['#FF1493', '#00FFFF', '#FFD700'],
+              farewell: ['#8B4513', '#DAA520', '#F4E4BC'],
+              office: ['#2C3E50', '#34495E', '#BDC3C7'],
+              graduation: ['#000080', '#FFD700', '#FFFFFF'],
+              wedding: ['#FFB6C1', '#FFFFFF', '#228B22'],
+              casual: ['#87CEEB', '#98FB98', '#F0E68C']
+            };
+            return colors[type] || ['#FF6B6B', '#4ECDC4', '#45B7D1'];
+          };
+
+          const getOutfitRecommendations = (type, budget) => {
+            const outfits = {
+              birthday: [
+                { item: 'Neon Crop Top & High-waist Jeans', price: '₹2,000-3,200', style: 'Trendy & Fun' },
+                { item: 'Sequined Mini Dress', price: '₹2,500-5,000', style: 'Party Ready' },
+                { item: 'Glow-in-dark Accessories', price: '₹800-1,600', style: 'Theme Perfect' }
+              ],
+              farewell: [
+                { item: 'Smart Casual Blazer', price: '₹3,200-6,400', style: 'Professional' },
+                { item: 'Midi Dress with Cardigan', price: '₹2,800-5,600', style: 'Elegant' },
+                { item: 'Memory Pin/Badge Collection', price: '₹400-1,200', style: 'Sentimental' }
+              ],
+              office: [
+                { item: 'Business Formal Suit', price: '₹4,800-9,600', style: 'Professional' },
+                { item: 'Cocktail Dress', price: '₹4,000-8,000', style: 'Semi-formal' },
+                { item: 'Professional Accessories', price: '₹1,600-3,200', style: 'Polished' }
+              ]
+            };
+            return outfits[type] || outfits.birthday;
+          };
+
+          const getDecorIdeas = (type, budget) => {
+            const decor = {
+              birthday: [
+                'LED String Lights & Neon Balloons',
+                'Photo Booth with Glow Props',
+                'Blacklight Reactive Decorations',
+                'Colorful Streamers & Confetti'
+              ],
+              farewell: [
+                'Memory Wall with Photos',
+                'Farewell Messages Board',
+                'Polaroid Photo Station',
+                'Milestone Timeline Display'
+              ],
+              office: [
+                'Elegant Centerpieces',
+                'Corporate Branded Decorations',
+                'Professional Lighting Setup',
+                'Award Display Area'
+              ]
+            };
+            return decor[type] || decor.birthday;
+          };
+
+          const getPlaylistSuggestions = (type) => {
+            const playlists = {
+              birthday: ['Upbeat Pop Hits', 'Dance Floor Anthems', 'Party Classics', 'Current Chart Toppers'],
+              farewell: ['Nostalgic Hits', 'Friendship Songs', 'Memory Lane Classics', 'Emotional Ballads'],
+              office: ['Professional Background Music', 'Jazz & Lounge', 'Instrumental Hits', 'Corporate Friendly Pop']
+            };
+            return playlists[type] || playlists.birthday;
+          };
+
+          const getBudgetBreakdown = (budget, guestCount) => {
+            const budgetNum = parseInt(budget) || 1000;
+            return {
+              decorations: Math.round(budgetNum * 0.3),
+              food: Math.round(budgetNum * 0.4),
+              outfits: Math.round(budgetNum * 0.2),
+              misc: Math.round(budgetNum * 0.1)
+            };
+          };
+
+          return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900" },
+            React.createElement('div', { className: "container mx-auto px-4 py-8" },
+              React.createElement('div', { className: "text-center mb-12" },
+                React.createElement('h1', { className: "text-5xl font-bold text-white mb-4 flex items-center justify-center gap-3" },
+                  React.createElement(Sparkles, { className: "text-yellow-400" }),
+                  'AI Event Planner',
+                  React.createElement(Sparkles, { className: "text-yellow-400" })
+                ),
+                React.createElement('p', { className: "text-xl text-blue-200" }, 'Plan perfect events with AI-powered recommendations'),
+                React.createElement('p', { className: "text-lg text-yellow-400 mt-2" }, 'Created by Muskii - College Project')
+              ),
+              // Rest of your component JSX would go here - this is a simplified version for quick setup
+              React.createElement('div', { className: "max-w-4xl mx-auto bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl text-center" },
+                React.createElement('h2', { className: "text-2xl font-bold text-white mb-4" }, '🚀 AI Event Planner Demo'),
+                React.createElement('p', { className: "text-white/80 mb-6" }, 'This is a simplified version for quick GitHub deployment. Full interactive version coming soon!'),
+                React.createElement('div', { className: "grid md:grid-cols-3 gap-4 mb-8" },
+                  React.createElement('div', { className: "bg-white/5 rounded-xl p-4" },
+                    React.createElement('h3', { className: "text-yellow-400 font-bold mb-2" }, '🎯 Smart Planning'),
+                    React.createElement('p', { className: "text-white/70 text-sm" }, 'AI-powered event recommendations')
+                  ),
+                  React.createElement('div', { className: "bg-white/5 rounded-xl p-4" },
+                    React.createElement('h3', { className: "text-green-400 font-bold mb-2" }, '💰 Budget in INR'),
+                    React.createElement('p', { className: "text-white/70 text-sm" }, 'Indian market pricing & planning')
+                  ),
+                  React.createElement('div', { className: "bg-white/5 rounded-xl p-4" },
+                    React.createElement('h3', { className: "text-pink-400 font-bold mb-2" }, '👗 Outfit Suggestions'),
+                    React.createElement('p', { className: "text-white/70 text-sm" }, 'Style recommendations with pricing')
+                  )
+                ),
+                React.createElement('div', { className: "bg-gradient-to-r from-yellow-400 to-orange-500 text-purple-900 font-bold rounded-xl p-4" },
+                  React.createElement('p', { className: "text-lg" }, '✨ Full Interactive Version Available on Request ✨')
+                )
+              )
+            )
+          );
+        };
+
+        ReactDOM.render(React.createElement(EventPlannerApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
